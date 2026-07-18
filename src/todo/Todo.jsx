@@ -1,25 +1,37 @@
-import { useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
 import { FaCheckCircle } from 'react-icons/fa';
 import { MdDelete } from 'react-icons/md';
 
 export const Todo = () => {
   const [inputValue, setInputvalue] = useState('');
-  const [task, setTask] = useState([]);
-  const [complete, setComplete] = useState(false);
+  const [tasks, setTasks] = useState([]);
   const [draggedItems, setDraggedItems] = useState(null);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (inputValue.trim() === '') return;
+
+    const text = inputValue.trim();
+
+    if (!text) return;
+
+    if (tasks.some((task) => task.text.toLowerCase() === text.toLowerCase())) {
+      alert('Task already exists!');
+      return;
+    }
+
+    setTasks((prev) => [...prev, { id: Date.now(), text, complete: false }]);
     setInputvalue('');
-    if (task.includes(inputValue)) return;
-
-    if (!inputValue) return;
-
-    setTask((prev) => [...prev, inputValue]);
   };
-  const handleDelete = (ind) => {
-    setTask(task.filter((_, index) => index != ind));
+  const handleDelete = (id) => {
+    setTasks((prev) => prev.filter((task) => task.id !== id));
+  };
+
+  const toggleComplete = (id) => {
+    setTasks((prev) =>
+      prev.map((task) =>
+        task.id === id ? { ...task, completed: !task.completed } : task,
+      ),
+    );
   };
 
   const handleDragStart = (index) => {
@@ -30,74 +42,77 @@ export const Todo = () => {
   };
 
   const handleDrop = (index) => {
-    const updatedTodos = [...task];
-    const draggedTodo = updatedTodos.splice(draggedItems, 1)[0];
+    if (draggedItems === [...tasks]) return;
 
-    updatedTodos.splice(index, 0, draggedTodo);
-    setTask(updatedTodos);
+    const updatedTasks = [...tasks];
+    const draggedTask = updatedTasks.splice(draggedItems, 1)[0];
+
+    updatedTasks.splice(index, 0, draggedTask);
+
+    setTasks(updatedTasks);
     setDraggedItems(null);
   };
 
   return (
     <>
-      <header style={{ display: 'flex', justifyContent: 'center' }}>
-        <h1>Todo List</h1>
-      </header>
-      <section>
-        <form
-          style={{ display: 'flex', justifyContent: 'center' }}
-          onSubmit={handleSubmit}
-        >
-          <div>
+      <div className='min-h-screen bg-blue-950 flex justify-center items-center p-5'>
+        <div className='w-full max-w-lg border-x-indigo-400 rounded-xl shadow-lg p-6'>
+          <h1 className='text-3xl font-bold text-center mb-6 text-white'>
+            Todo List
+          </h1>
+          <form onSubmit={handleSubmit} className='flex gap-3 mb-6'>
             <input
               type='text'
-              autoComplete='off'
               value={inputValue}
               onChange={(e) => setInputvalue(e.target.value)}
+              placeholder='Enter a task...'
+              className='flex-1 border rounded-xl px-4 py-2 outline-none text-white focus:ring-2 focus:ring-blue-500 '
             />
-          </div>
-          <div>
-            <button type='submit'>Add</button>
-          </div>
-        </form>
-        <section>
-          <ul>
-            {task.map((todo, index) => (
-              <li
-                key={index}
-                style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  gap: '10px',
-                }}
-              >
-                <span
+            <button
+              type='submit'
+              className='bg-blue-600 text-white px-5 rounded-xl hover:bg-blue-700 transition'
+            >
+              Add
+            </button>
+          </form>
+          {tasks.length === 0 ? (
+            <p className='text-center text-gray-500'>No tasks yet.</p>
+          ) : (
+            <ul className='space-y-3'>
+              {tasks.map((task, index) => (
+                <li
+                  key={task.id}
                   draggable
                   onDragStart={() => handleDragStart(index)}
                   onDragOver={handleDragOver}
-                  onDrag={() => handleDrop(index)}
+                  onDrop={() => handleDrop(index)}
+                  className='flex items-center justify-between bg-gray-50 border rounded-lg p-3 cursor-move hover:shadow-md transition'
                 >
-                  {todo}
-                </span>
-                <button
-                  onClick={() => {
-                    setComplete(!complete);
-                    console.log(complete);
-                  }}
-                >
-                  <FaCheckCircle />
-                </button>
-                <button>
-                  <MdDelete
-                    style={{ color: 'red' }}
-                    onClick={() => handleDelete(index)}
-                  />
-                </button>
-              </li>
-            ))}
-          </ul>
-        </section>
-      </section>
+                  <span
+                    className={`flex-1 ${task.complete ? 'line-through text-gray-400' : 'text-gray-800'}`}
+                  >
+                    {task.text}
+                  </span>
+                  <div className='flex gap-3'>
+                    <button
+                      onClick={() => toggleComplete(task.id)}
+                      className='text-gray-600 hover:text-green-700 text-xl'
+                    >
+                      <FaCheckCircle />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(task.id)}
+                      className='text-red-600 hover:text-red-700 text-2xl'
+                    >
+                      <MdDelete />
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
     </>
   );
 };
