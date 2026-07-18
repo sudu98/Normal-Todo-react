@@ -55,18 +55,19 @@ export const Todo = () => {
 
   return (
     <>
-      <div className='min-h-screen bg-blue-950 flex justify-center items-center p-5'>
-        <div className='w-full max-w-lg border-x-indigo-400 rounded-xl shadow-lg p-6'>
-          <h1 className='text-3xl font-bold text-center mb-6 text-white'>
+      <div className='min-h-screen bg-sky-800 flex justify-center items-center p-5'>
+        <div className='w-full max-w-lg border-x-indigo-500 rounded-xl shadow-lg p-6 bg-stone-300'>
+          <h1 className='text-3xl font-bold text-center mb-3 text-black'>
             Todo List
           </h1>
+          <h6 className='text-center font-bold mb-3'>Drag and Drop supports</h6>
           <form onSubmit={handleSubmit} className='flex gap-3 mb-6'>
             <input
               type='text'
               value={inputValue}
               onChange={(e) => setInputvalue(e.target.value)}
               placeholder='Enter a task...'
-              className='flex-1 border rounded-xl px-4 py-2 outline-none text-white focus:ring-2 focus:ring-blue-500 '
+              className='flex-1 border rounded-xl px-4 py-2 outline-none text-black focus:ring-2 focus:ring-blue-500 '
             />
             <button
               type='submit'
