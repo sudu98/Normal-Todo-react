@@ -6,14 +6,11 @@ export const Todo = () => {
   const [inputValue, setInputvalue] = useState('');
   const [task, setTask] = useState([]);
   const [complete, setComplete] = useState(false);
-
-  const handleDelete = (ind) => {
-    setTask(task.filter((_, index) => index != ind));
-  };
+  const [draggedItems, setDraggedItems] = useState(null);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
+    if (inputValue.trim() === '') return;
     setInputvalue('');
     if (task.includes(inputValue)) return;
 
@@ -21,7 +18,26 @@ export const Todo = () => {
 
     setTask((prev) => [...prev, inputValue]);
   };
-  // console.log(complete);
+  const handleDelete = (ind) => {
+    setTask(task.filter((_, index) => index != ind));
+  };
+
+  const handleDragStart = (index) => {
+    setDraggedItems(index);
+  };
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (index) => {
+    const updatedTodos = [...task];
+    const draggedTodo = updatedTodos.splice(draggedItems, 1)[0];
+
+    updatedTodos.splice(index, 0, draggedTodo);
+    setTask(updatedTodos);
+    setDraggedItems(null);
+  };
+
   return (
     <>
       <header style={{ display: 'flex', justifyContent: 'center' }}>
@@ -49,21 +65,34 @@ export const Todo = () => {
             {task.map((todo, index) => (
               <li
                 key={index}
-                style={{ display: 'flex', justifyContent: 'center' }}
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  gap: '10px',
+                }}
               >
-                <span>{todo}</span>
+                <span
+                  draggable
+                  onDragStart={() => handleDragStart(index)}
+                  onDragOver={handleDragOver}
+                  onDrag={() => handleDrop(index)}
+                >
+                  {todo}
+                </span>
                 <button
                   onClick={() => {
                     setComplete(!complete);
                     console.log(complete);
                   }}
                 >
-                  <FaCheckCircle style={{ color: complete ? 'green' : '' }} />
+                  <FaCheckCircle />
                 </button>
-                <MdDelete
-                  style={{ color: 'red' }}
-                  onClick={() => handleDelete(index)}
-                />
+                <button>
+                  <MdDelete
+                    style={{ color: 'red' }}
+                    onClick={() => handleDelete(index)}
+                  />
+                </button>
               </li>
             ))}
           </ul>
