@@ -19,7 +19,7 @@ export const Todo = () => {
       return;
     }
 
-    setTasks((prev) => [...prev, { id: Date.now(), text, complete: false }]);
+    setTasks((prev) => [...prev, { id: Date.now(), text, completed: false }]);
     setInputvalue('');
   };
   const handleDelete = (id) => {
@@ -89,14 +89,14 @@ export const Todo = () => {
                   className='flex items-center justify-between bg-gray-50 border rounded-lg p-3 cursor-move hover:shadow-md transition'
                 >
                   <span
-                    className={`flex-1 ${task.complete ? 'line-through text-gray-400' : 'text-gray-800'}`}
+                    className={`flex-1 ${task.completed ? 'line-through text-gray-400' : 'text-gray-800'}`}
                   >
                     {task.text}
                   </span>
                   <div className='flex gap-3'>
                     <button
                       onClick={() => toggleComplete(task.id)}
-                      className='text-gray-600 hover:text-green-700 text-xl'
+                      className={`text-xl ${task.completed ? 'text-green-600' : 'text-gray-500 hover:text-green-600'}`}
                     >
                       <FaCheckCircle />
                     </button>
